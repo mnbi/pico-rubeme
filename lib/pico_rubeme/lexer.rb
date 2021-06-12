@@ -174,7 +174,8 @@ module PicoRubeme
         result << "\"#{head}\""
         result.concat(split(rest, false))
       else
-        result.concat(head.split(/(\()|\s|(\))/).delete_if{|s| s.empty?})
+        # Split with "(", "'", space characters, and ")".
+        result.concat(head.split(/(\()|(')|\s|(\))/).delete_if{|s| s.empty?})
         result.concat(split(rest, true))
       end
 
