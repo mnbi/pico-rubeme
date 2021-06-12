@@ -1,3 +1,49 @@
 #!/usr/bin/env ruby
 
 require "pico_rubeme"
+
+def usage
+  puts <<HELP
+usage:
+    pico_rubeme [option] [FILE]
+option:
+    -d, --debug   : specify to run in verbose mode
+    -v, --version : print version
+    -h, --help    : show this message
+HELP
+end
+
+def print_version
+  puts PicoRubeme.make_version("pico-rubeme")
+end
+
+opts = {}
+
+while ARGV.size > 0
+  arg = ARGV.shift
+  case arg
+  when "-d", "--debug"
+    opts[:verbose] = true
+  when "-v", "--version"
+    print_version
+    exit 0
+  when "-h", "--help"
+    usage
+    exit 0
+  else
+    opts[:files] ||= []
+    opts[:files] << arg
+  end
+end
+
+begin
+  if opts[:files]
+    PicoRubeme.run(**opts)
+  else
+    opts[:prompt] = opts[:verbose] ? "pico[#{PicoRubeme::VERSION}]> " : "pico> "
+    PicoRubeme::Repl.start(**opts)
+  end
+rescue PicoRubeme::Error => e
+  puts e.message
+  exit 1
+end
