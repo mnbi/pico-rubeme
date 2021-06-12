@@ -84,6 +84,23 @@ module PicoRubeme
       nil
     end
 
+    def skip_lpraen(offset = 0)
+      if peek(offset).type == :lparen
+        skip(offset)
+      else
+        raise UnexpectedTokenTypeError,
+              "got=%s, expected=%s" % [peek(offset).type, :lparen]
+      end
+    end
+
+    def skip_rparen(offset = 0)
+      if peek(offset).type == :rparen
+        skip(offset)
+      else
+        MissingRightParenthesisError
+      end
+    end
+
     def rewind
       init_pos
       self
@@ -175,7 +192,7 @@ module PicoRubeme
         result.concat(split(rest, false))
       else
         # Split with "(", "'", space characters, and ")".
-        result.concat(head.split(/(\()|(')|\s|(\))/).delete_if{|s| s.empty?})
+        result.concat(head.split(/(\()|(#\()|(')|\s|(\))/).delete_if{|s| s.empty?})
         result.concat(split(rest, true))
       end
 
