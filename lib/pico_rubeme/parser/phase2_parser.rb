@@ -58,7 +58,8 @@ module PicoRubeme
       end
 
       def to_quotation(list)
-        not_implemented_yet("quote")
+        # [ *quote* <expression> ]
+        make_quotation(list[1])
       end
 
       def to_lambda_expression(list)

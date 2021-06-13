@@ -73,6 +73,10 @@ module PicoRubeme
     end
 
     # *quotation*
+    def make_quotation(expression)
+      quotation = ["*quotation*"]
+      quotation << expression
+    end
 
     # *lmabda_expression*
     def make_lambda_expression(formals, body)

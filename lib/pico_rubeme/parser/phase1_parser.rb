@@ -95,6 +95,9 @@ module PicoRubeme
       end
 
       def parse_quotation(lexer)
+        lexer.skip              # skip "'" (quotation mark)
+        exp = parse_expression(lexer)
+        [[simple_type(:identifier), "quote"], exp]
       end
 
       # :startdoc:
