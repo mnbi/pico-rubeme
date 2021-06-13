@@ -1,14 +1,64 @@
 # frozen_string_literal: true
 
+require "fileutils"
 require "readline"
 
 module PicoRubeme
 
   class Repl < Component
 
+    RUBEME_DATA_HOME = File.expand_path("rubeme", ENV["XDG_DATA_HOME"]) ||
+                       File.expand_path("~/.rubeme")
+    HISTORY_FILE = File.expand_path("rubeme_history", RUBEME_DATA_HOME)
+    HISTORY_MAX = 100
+
+    FileUtils.mkdir_p(RUBEME_DATA_HOME) unless FileTest.exist?(RUBEME_DATA_HOME)
+
     def self.start(prompt: "REPL> ", verbose: false)
+      size = load_history
+      if verbose
+        puts "Load %d entries into the history." % size
+      end
+
       msg = Repl.new(prompt: prompt, verbose: verbose).loop
       puts msg if msg
+
+      size = save_history
+      if verbose
+        puts "Save %d entries from the history." % size
+      end
+    end
+
+    def self.load_history
+      if FileTest.exist?(HISTORY_FILE)
+        File.readlines(HISTORY_FILE, chomp: true).each { |line|
+          Readline::HISTORY << line
+        }
+        Readline::HISTORY.size
+      else
+        0
+      end
+    end
+
+    def self.save_history
+      prev_entries = []
+      if FileTest.exist?(HISTORY_FILE)
+        prev_entries = File.readlines(HISTORY_FILE, chomp: true)
+      end
+
+      candidates = Readline::HISTORY.find_all{|e| !e.empty?}
+      entries = []
+
+      candidates.each_with_index { |e, i|
+        entries << e if e != prev_entries[i]
+      }
+
+      size = [entries.size, HISTORY_MAX].min
+      offset = entries.size - size
+      File.open(HISTORY_FILE, "a") { |f|
+        size.times{|i| f.puts(entries[offset + i]) }
+      }
+      size
     end
 
     def initialize(prompt:, verbose: false)
