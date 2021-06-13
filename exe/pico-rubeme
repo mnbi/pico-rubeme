@@ -14,7 +14,7 @@ HELP
 end
 
 def print_version
-  puts PicoRubeme.make_version("pico-rubeme")
+  puts "(" + PicoRubeme.make_version("PicoRubeme") + ")"
 end
 
 opts = {}

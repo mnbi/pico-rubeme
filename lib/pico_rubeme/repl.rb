@@ -74,7 +74,13 @@ module PicoRubeme
       @prompt = prompt
     end
 
+    def greeting
+      puts version
+    end
+
     def loop
+      greeting
+
       second_prompt = "." * (@prompt.length - 1) + " "
       msg = Kernel.loop {
         begin
@@ -95,6 +101,7 @@ module PicoRubeme
           next
         end
       }
+
       msg
     end
 

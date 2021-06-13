@@ -19,7 +19,7 @@ module PicoRubeme
     end
 
     def version
-      if @components.empty?
+      if @components.empty? || !@verbose
         self.class.version
       else
         vers = [self.class.version]
