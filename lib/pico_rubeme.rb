@@ -5,6 +5,7 @@ module PicoRubeme
   require_relative "pico_rubeme/version"
   require_relative "pico_rubeme/lexer"
   require_relative "pico_rubeme/component"
+  require_relative "pico_rubeme/ast"
   require_relative "pico_rubeme/parser"
   require_relative "pico_rubeme/environment"
   require_relative "pico_rubeme/evaluator"

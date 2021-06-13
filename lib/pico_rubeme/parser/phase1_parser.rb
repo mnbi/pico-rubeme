@@ -5,6 +5,7 @@ module PicoRubeme
   module Parser
 
     class Phase1Parser < Component
+      include AST
       include Utils
 
       def parse(lexer)
@@ -40,19 +41,19 @@ module PicoRubeme
 
       def parse_simple_expression(lexer)
         type, literal = *lexer.next
-        [ast_simple_type(type), literal]
+        [simple_type(type), literal]
       end
 
-      def ast_simple_type(token_type)
+      def simple_type(token_type)
         case token_type
         when :identifier
-          "*identifier*"
+          tag("identifier")
         when :boolean, :character, :number, :string
-          "*#{token_type}*"
+          tag("#{token_type}")
         when :dot
-          "*dot*"
+          tag("dot")
         else
-          "*illegal*"
+          tag("illegal")
         end
       end
 
