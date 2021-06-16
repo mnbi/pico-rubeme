@@ -8,10 +8,9 @@ module PicoRubeme
     end
   end
 
-  TAG = /\A\*(.+)\*\Z/
-
   require_relative "pico_rubeme/error"
   require_relative "pico_rubeme/version"
+  require_relative "pico_rubeme/object"
   require_relative "pico_rubeme/lexer"
   require_relative "pico_rubeme/component"
   require_relative "pico_rubeme/ast"

@@ -11,6 +11,7 @@ module PicoRubeme
     require_relative "parser/phase2_parser"
 
     class Parser < Component
+      include AST
 
       def initialize
         super()
@@ -20,7 +21,7 @@ module PicoRubeme
 
       def parse(lexer)
         return [] if lexer.nil?
-        program = ["*program*"]
+        program = make_ast_node("program")
         Kernel.loop {
           program << @components[:p2].parse(@components[:p1].parse(lexer))
         }

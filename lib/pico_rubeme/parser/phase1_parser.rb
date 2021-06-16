@@ -24,70 +24,71 @@ module PicoRubeme
         end
       end
 
-      TOKEN_START_DELIMITERS = [  # :nodoc:
-        :lparen,                  # list: ( ... )
-        :vec_lparen,              # vector: #( ... )
-        :bytevec_lparen,          # bytevector: #u8( ... )
-        :quotation,               # quotation: '<something>
-        :backquote,               # quasiquote: `<something>
-        :comma,                   # used in quasiquote
-        :comma_at,                # used in quasiquote
-        :comment_lparen,          # comment start
+      TOKEN_START_DELIMITERS = [ # :nodoc:
+        "lparen",                # list: ( ... )
+        "vec-lparen",            # vector: #( ... )
+        "bytevec-lparen",        # bytevector: #u8( ... )
+        "quotation",             # quotation: '<something>
+        "backquote",             # quasiquote: `<something>
+        "comma",                 # used in quasiquote
+        "comma-at",              # used in quasiquote
+        "comment-lparen",        # comment start
       ]
 
       def start_delimiter?(token)
-        TOKEN_START_DELIMITERS.include?(token.type)
+        TOKEN_START_DELIMITERS.include?(token_type(token))
       end
 
       def parse_simple_expression(lexer)
-        type, literal = *lexer.next
-        [simple_type(type), literal]
-      end
-
-      def simple_type(token_type)
-        case token_type
-        when :identifier
-          tag("identifier")
-        when :boolean, :character, :number, :string
-          tag("#{token_type}")
-        when :dot
-          tag("dot")
+        token = lexer.next
+        ast_type = simple_type(token_type(token))
+        if ast_type != "illegal"
+          make_ast_node(ast_type, token_literal(token))
         else
-          tag("illegal")
+          raise SchemeSyntaxError, "%s" % token_literal(token)
         end
       end
 
+      SUPPORTED_SIMPLE_TYPES = [ # :nodoc:
+        "identifier", "boolean", "character", "number", "string",
+        "dot",
+      ]
+
+      def simple_type(token_type)
+        SUPPORTED_SIMPLE_TYPES.include?(token_type) ? token_type : "illegal"
+      end
+
       def parse_compound_expression(lexer)
-        case lexer.peek.type
-        when :vec_lparen
+        case token_type(lexer.peek)
+        when "vec-lparen"
           parse_vector(lexer)
-        when :quotation
+        when "quotation"
           parse_quotation(lexer)
-        when :lparen
+        when "lparen"
           parse_list(lexer)
         else
-          raise SchemeSyntaxError, "%s" % lexer.peek.literal
+          raise SchemeSyntaxError, "%s" % token_literal(lexer.peek)
         end
       end
 
       def parse_list(lexer)
-        if lexer.peek(1).type == :rparen
+        if token_type?(lexer.peek(1), "rparen")
           # an empty list
           lexer.skip_rparen(1)
-          ["*empty_list*"]
+          make_ast_node("empty-list")
         else
           parse_container([], lexer)
         end
       end
 
       def parse_vector(lexer)
-        parse_container(["*vector*"], lexer)
+        parse_container(make_ast_node("vector"), lexer)
       end
 
       def parse_container(container, lexer)
-        lexer.skip              # skip :lparen or :vec_lparen
+        lexer.skip              # skip "lparen" or "vec-lparen"
         Kernel.loop {
-          break if lexer.peek.type == :rparen
+          break if token_type?(lexer.peek, "rparen")
           container << parse_expression(lexer)
         }
         lexer.skip_rparen
@@ -97,7 +98,7 @@ module PicoRubeme
       def parse_quotation(lexer)
         lexer.skip              # skip "'" (quotation mark)
         exp = parse_expression(lexer)
-        [[simple_type(:identifier), "quote"], exp]
+        [make_ast_node("identifier", "quote"), exp]
       end
 
       # :startdoc:

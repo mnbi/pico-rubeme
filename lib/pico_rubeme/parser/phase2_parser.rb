@@ -71,7 +71,7 @@ module PicoRubeme
         # type 1: <identifier>
         # type 2: [ <identifier>* ]
         # type 3: [ <identifier>+, <dot>, <identifier> ] (not supported)
-        if type?(list, "identifier")
+        if identifier?(list)
           # type 1
           list
         else
@@ -114,7 +114,7 @@ module PicoRubeme
         ident = nil
         exp = nil
 
-        if type?(list[1], "identifier")
+        if rubeme_object?(list[1]) && identifier?(list[1])
           # type 1 and type 2
           ident = list[1]
           exp = parse(list[2])

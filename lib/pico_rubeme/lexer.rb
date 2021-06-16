@@ -8,43 +8,30 @@ module PicoRubeme
 
   TOKEN_TYPES = [             # :nodoc:
     # delimiters
-    :lparen,                  # `(`
-    :rparen,                  # `)`
-    :vec_lparen,              # `#(`
-    :bytevec_lparen,          # `#u8(`
-    :quotation,               # `'`
-    :backquote,               # "`" (aka quasiquote)
-    :comma,                   # `,`
-    :comma_at,                # `,@`
-    :dot,                     # `.`
-    :semicolon,               # `;`
-    :comment_lparen,          # `#|`
-    :comment_rparen,          # `|#`
+    "lparen",                   # `(`
+    "rparen",                   # `)`
+    "vec-lparen",               # `#(`
+    "bytevec-lparen",           # `#u8(`
+    "quotation",                # `'`
+    "backquote",                # "`" (aka quasiquote)
+    "comma",                    # `,`
+    "comma-at",                 # `,@`
+    "dot",                      # `.`
+    "semicolon",                # `;`
+    "comment-lparen",           # `#|`
+    "comment-rparen",           # `|#`
     # value types
-    :identifier,              # `foo`
-    :boolean,                 # `#f` or `#t` (`#false` or `#true`)
-    :number,                  # `123`, `456.789`, `1/2`, `3+4i`
-    :character,               # `#\a`
-    :string,                  # `"hoge"`
+    "identifier",               # `foo`
+    "boolean",                  # `#f` or `#t` (`#false` or `#true`)
+    "number",                   # `123`, `456.789`, `1/2`, `3+4i`
+    "character",                # `#\a`
+    "string",                   # `"hoge"`
     # control
-    :illegal,
+    "illegal",
   ]
 
-  # a structure to store properties of a token of Scheme program.
-
-  Token = Struct.new(:type, :literal) {
-    # :stopdoc:
-    # `to_a` and `to_h` are automatically defined for a class
-    # generated from Struct.
-    # :startdoc:
-
-    alias :to_s :literal
-  }
-
   class Lexer
-    def self.new_token(type, literal)
-      Token.new(type, literal)
-    end
+    include Object
 
     def initialize(source)
       @tokens = tokenize(source)
@@ -84,17 +71,17 @@ module PicoRubeme
       nil
     end
 
-    def skip_lpraen(offset = 0)
-      if peek(offset).type == :lparen
+    def skip_lparen(offset = 0)
+      if token_type(peek(offset)) == "lparen"
         skip(offset)
       else
         raise UnexpectedTokenTypeError,
-              "got=%s, expected=%s" % [peek(offset).type, :lparen]
+              "got=%s, expected=%s" % [token_type(peek(offset)), "lparen"]
       end
     end
 
     def skip_rparen(offset = 0)
-      if peek(offset).type == :rparen
+      if token_type(peek(offset)) == "rparen"
         skip(offset)
       else
         MissingRightParenthesisError
@@ -107,6 +94,7 @@ module PicoRubeme
     end
 
     # :stopdoc:
+    private
 
     def init_pos
       @curr_pos = @next_pos = 0
@@ -144,31 +132,31 @@ module PicoRubeme
       split(escape_quotation_in_string(source)).map { |literal|
         case literal
         when "("
-          Lexer.new_token(:lparen, literal)
+          make_token("lparen", literal)
         when ")"
-          Lexer.new_token(:rparen, literal)
+          make_token("rparen", literal)
         when "."                # dot
-          Lexer.new_token(:dot, literal)
+          make_token("dot", literal)
         when "'"                # single quotation
-          Lexer.new_token(:quotation, literal)
+          make_token("quotation", literal)
         when "#("               # sharp + lparen
-          Lexer.new_token(:vec_lparen, literal)
+          make_token("vec-lparen", literal)
         when "|"                # vertical bar
           # not supported yet
-          Lexer.new_token(:illegal, literal)
+          make_token("illegal", literal)
         when BOOLEAN
-          Lexer.new_token(:boolean, literal)
+          make_token("boolean", literal)
         when CHAR
-          Lexer.new_token(:character, literal)
+          make_token("character", literal)
         when STRING
-          Lexer.new_token(:string, literal)
+          make_token("string", literal)
         when REAL_NUM, RATIONAL, COMPLEX, PURE_IMAG
-          Lexer.new_token(:number, literal)
+          make_token("number", literal)
         else
           if Identifier.identifier?(literal)
-            Lexer.new_token(:identifier, literal)
+            make_token("identifier", literal)
           else
-            Lexer.new_token(:illegal, literal)
+            make_token("illegal", literal)
           end
         end
       }
