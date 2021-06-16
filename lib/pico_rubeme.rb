@@ -1,6 +1,15 @@
 # frozen_string_literal: true
 
 module PicoRubeme
+
+  module Utils
+    def not_implemented_yet(feature)
+      raise NotImplementedYetError, feature
+    end
+  end
+
+  TAG = /\A\*(.+)\*\Z/
+
   require_relative "pico_rubeme/error"
   require_relative "pico_rubeme/version"
   require_relative "pico_rubeme/lexer"

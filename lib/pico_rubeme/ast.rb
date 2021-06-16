@@ -4,8 +4,6 @@ module PicoRubeme
 
   module AST
 
-    TAG = /\*(.+)\*/
-
     def tag(name)
       "*#{name}*"
     end
@@ -38,6 +36,11 @@ module PicoRubeme
 
     def rest(list)
       list[1..-1]
+    end
+
+    # simple type
+    def literal(list)
+      list[1]
     end
 
     # *identifier*

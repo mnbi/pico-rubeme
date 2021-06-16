@@ -7,13 +7,6 @@ module PicoRubeme
   end
 
   module Parser
-
-    module Utils
-      def not_implemented_yet(feature)
-        raise NotImplementedYetError, feature
-      end
-    end
-
     require_relative "parser/phase1_parser"
     require_relative "parser/phase2_parser"
 
