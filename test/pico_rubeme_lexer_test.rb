@@ -4,6 +4,10 @@
 require "test_helper"
 
 class PicoRubemeLexerTest < Minitest::Test
+  def setup
+    @utils = Utils.instance
+  end
+
   def test_it_can_instantiate
     lexer = PicoRubeme.lexer("")
     refute_nil lexer
@@ -97,12 +101,10 @@ class PicoRubemeLexerTest < Minitest::Test
 
   private
 
-  include PicoRubeme::Object
-
   def assert_compound_tokens(tc, expected)
     lexer = PicoRubeme.lexer(tc)
     loop {
-      assert_equal expected.shift, token_type(lexer.next)
+      assert_equal expected.shift, @utils.token_type(lexer.next)
     }
   end
 
@@ -115,6 +117,6 @@ class PicoRubemeLexerTest < Minitest::Test
   end
 
   def assert_type(type, token)
-    assert_equal type, token_type(token)
+    assert_equal type, @utils.token_type(token)
   end
 end

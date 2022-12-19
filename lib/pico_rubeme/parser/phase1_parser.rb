@@ -5,8 +5,8 @@ module PicoRubeme
   module Parser
 
     class Phase1Parser < Component
-      include AST
-      include Utils
+      private_include AST
+      private_include Utils
 
       def parse(lexer)
         return [] if lexer.nil?

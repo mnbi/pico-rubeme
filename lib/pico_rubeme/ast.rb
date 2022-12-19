@@ -19,7 +19,7 @@ module PicoRubeme
 
     # *identifier*
     def identifier?(list)
-      ast_type?(list, "identifier")
+      ast?(list) && ast_type?(list, "identifier")
     end
 
     def identifier(list)

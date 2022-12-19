@@ -11,7 +11,7 @@ module PicoRubeme
     require_relative "parser/phase2_parser"
 
     class Parser < Component
-      include AST
+      private_include AST
 
       def initialize
         super()

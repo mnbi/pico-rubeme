@@ -5,8 +5,8 @@ module PicoRubeme
   module Parser
 
     class Phase2Parser < Component
-      include AST
-      include Utils
+      private_include AST
+      private_include Utils
 
       def parse(list)
         if ast?(list)

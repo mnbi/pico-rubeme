@@ -31,7 +31,7 @@ module PicoRubeme
   ]
 
   class Lexer
-    include Object
+    private_include Object
 
     def initialize(source)
       @tokens = tokenize(source)

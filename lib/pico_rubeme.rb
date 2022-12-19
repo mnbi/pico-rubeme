@@ -1,5 +1,15 @@
 # frozen_string_literal: true
 
+# :stopdoc:
+class Module
+  # Includes a module, then make all methods to private
+  def private_include(mod)
+    include(mod)
+    private(mod.instance_methods(false))
+  end
+end
+# :startdoc:
+
 module PicoRubeme
 
   module Utils
